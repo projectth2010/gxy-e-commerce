@@ -1,0 +1,27 @@
+@startuml TenantExternalOrderIngestion
+
+title External / Third-Party Order Ingestion (Concept)
+
+participant "External Platform\n(Marketplace)" as Ext
+participant "Integration Adapter\n(Channel Integration)" as Adapter
+participant "Tenant App\n(Order Domain)" as TenantApp
+participant "Analytics & Loyalty\n(Analytics/Loyalty Services)" as Analyt
+
+== Order Created on External Platform ==
+Ext -> Adapter : Order payload\n(external_order_id,\nitems, customer, amounts,\nshipping, payment_status)
+
+== Normalize & Map ==
+Adapter -> Adapter : Normalize payload\n(map products, prices,\ncustomer data)
+Adapter -> TenantApp : Import order\n(normalized order,\nsource=EXTERNAL,\nsource_ref=external_order_id)
+
+TenantApp -> TenantApp : Create internal order\n(channel=EXTERNAL,\nsource_reference set)
+TenantApp -> TenantApp : Match or create customer\nwithin tenant context
+TenantApp -> TenantApp : Reserve/update inventory\nas needed
+
+== Post-Processing ==
+TenantApp -> Analyt : Emit order + channel event\n(tenant_id, channel=EXTERNAL,\nsource_ref,...)
+TenantApp -> Analyt : Emit loyalty accrual event\n(if loyalty enabled)
+
+Ext <-- Adapter : Acknowledge import\n(status, internal_order_id optional)
+
+@enduml

@@ -1,0 +1,103 @@
+@startuml TenantCatalogAndStores
+
+title Tenant E-Commerce – Advanced Catalog & Multi-Store (Logical)
+
+skinparam linetype ortho
+
+entity "Tenant" as Tenant {
+  + tenant_id
+  --
+  name
+  code
+}
+
+entity "Store / Storefront" as Store {
+  + store_id
+  --
+  tenant_id
+  code
+  name
+  domain
+  locale
+  default_currency
+  theme_key
+}
+
+entity "Product" as Product {
+  + product_id
+  --
+  tenant_id
+  sku
+  base_name
+  product_type
+  status
+}
+
+entity "ProductVariant" as Variant {
+  + variant_id
+  --
+  tenant_id
+  product_id
+  sku
+  status
+}
+
+entity "AttributeDefinition" as AttrDef {
+  + attribute_id
+  --
+  tenant_id
+  code
+  name
+  data_type
+}
+
+entity "AttributeSet" as AttrSet {
+  + set_id
+  --
+  tenant_id
+  name
+}
+
+entity "AttributeSetMember" as AttrSetMember {
+  --
+  set_id
+  attribute_id
+  sort_order
+}
+
+entity "ProductAttributeValue" as AttrVal {
+  + value_id
+  --
+  tenant_id
+  product_id
+  variant_id
+  attribute_id
+  value
+}
+
+entity "StoreProduct" as StoreProduct {
+  --
+  tenant_id
+  store_id
+  product_id
+  is_visible
+  override_price
+  override_name
+}
+
+Tenant ||--o{ Store : has
+Tenant ||--o{ Product : owns
+Product ||--o{ Variant : has
+
+Tenant ||--o{ AttrDef : defines
+Tenant ||--o{ AttrSet : defines
+AttrSet ||--o{ AttrSetMember : groups
+AttrDef ||--o{ AttrSetMember : included in
+
+Product ||--o{ AttrVal : has
+Variant ||--o{ AttrVal : may have
+
+Store ||--o{ StoreProduct : config
+Product ||--o{ StoreProduct : mapped
+
+@enduml

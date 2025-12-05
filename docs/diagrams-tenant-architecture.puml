@@ -1,0 +1,45 @@
+@startuml TenantArchitecture
+
+title Tenant E-Commerce – Main Components (Concept Level)
+
+skinparam componentStyle rectangle
+
+package "Tenant Context" {
+  [Storefront UI]
+  [Backoffice UI]
+
+  [Tenant Application Service] as TenantApp
+}
+
+package "Shared Domain Services" {
+  [Payment Service]
+  [Notification Service]
+  [Media/File Service]
+}
+
+package "Control Plane" {
+  [Center-Tenant Management]
+  [Plan & Feature Management]
+}
+
+actor "Tenant Owner / Staff" as TenantAdmin
+actor "Customer" as Customer
+
+' User interactions
+Customer --> [Storefront UI]
+TenantAdmin --> [Backoffice UI]
+
+' UI to Tenant App
+[Storefront UI] --> TenantApp
+[Backoffice UI] --> TenantApp
+
+' Tenant App to Shared Services
+TenantApp --> [Payment Service] : process payments
+TenantApp --> [Notification Service] : order/customer notifications
+TenantApp --> [Media/File Service] : product images, banners
+
+' Control Plane to Tenant App
+[Center-Tenant Management] --> TenantApp : lifecycle & config\n(create/update/suspend)
+[Plan & Feature Management] --> TenantApp : effective plan & features\n(pull/push)
+
+@enduml

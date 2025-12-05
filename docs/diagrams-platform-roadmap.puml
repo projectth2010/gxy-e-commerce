@@ -1,0 +1,51 @@
+@startuml PlatformRoadmap
+' Combined roadmap: Center Control (C1–C6) and Tenant (T1–T6)
+
+skinparam backgroundColor #FFFFFF
+skinparam handwritten false
+skinparam defaultTextAlignment center
+
+title Platform Roadmap – Center Control (C1–C6) & Tenant (T1–T6)
+
+' Use two parallel lifelines to illustrate evolution
+
+' Center Control timeline
+concise "Center Control (Control Plane)" as CC {
+  @0
+  CC is C1 : Platform Foundations – Multi-Tenant Ready
+  @1
+  CC is C2 : Tenant Lifecycle & Basic Governance
+  @2
+  CC is C3 : Plan/Package, Feature Toggles & Billing Readiness
+  @3
+  CC is C4 : Cross-Tenant Monitoring, Audit & Compliance
+  @4
+  CC is C5 : Ecosystem Integrations & Marketplace Management
+  @5
+  CC is C6 : Data, Analytics & AI-Driven Operations
+}
+
+' Tenant timeline (per-tenant view, conceptual)
+concise "Tenant E-Commerce (Per Tenant)" as TEN {
+  @0
+  TEN is T1 : Tenant Not Onboarded
+  @1
+  TEN is T2 : Tenant Onboarded – Store Not Live
+  @2
+  TEN is T3 : Tenant Live – Core E-Commerce (MVP)
+  @3
+  TEN is T4 : Tenant Live – Advanced Catalog & Multi-Store
+  @4
+  TEN is T5 : Tenant Live – Integrations & POS
+  @5
+  TEN is T6 : Tenant Live – Loyalty/Royalty & AI-Driven
+}
+
+' Visual hints for dependencies (comments only for human readers)
+' - Before T2, need at least C1–C2
+' - Before T3, need at least C2–C3
+' - Before T4, need at least C3–C4
+' - Before T5, need at least C3–C5
+' - Before T6, need at least C3–C6
+
+@enduml

@@ -1,0 +1,34 @@
+@startuml TenantLoyaltyFlow
+
+title Loyalty Accrual & Redemption (Concept)
+
+participant "Customer / Staff UI\n(Storefront or POS)" as UI
+participant "Tenant App\n(Order & Loyalty Hooks)" as TenantApp
+participant "Loyalty Service\n(Loyalty Domain)" as Loy
+participant "Analytics Platform" as Analyt
+
+== During Checkout: Optional Redemption ==
+UI -> TenantApp : Load cart + customer\n(with loyalty info)
+TenantApp -> Loy : Get loyalty balance & offers\n(customer_id, tenant_id)
+Loy --> TenantApp : Points balance,\nredeemable options
+
+UI -> TenantApp : Apply loyalty redemption\n(points to use)
+TenantApp -> Loy : Validate & reserve points\n(for this order)
+Loy --> TenantApp : Reservation ok / fail
+UI <-- TenantApp : Updated totals\n(after redemption if any)
+
+== Order Placement ==
+UI -> TenantApp : Place order\n(cart, loyalty redemption)
+TenantApp -> TenantApp : Create order\n(include loyalty usage)
+TenantApp -> Loy : Confirm redemption\n(for this order)
+Loy --> TenantApp : Redemption recorded
+
+== Accrual After Order Completion ==
+TenantApp -> Loy : Accrue points\n(based on order value/rules)
+Loy --> TenantApp : Accrual recorded
+
+== Analytics ==
+Loy -> Analyt : Emit loyalty events\n(accrual, redemption,\ncustomer, order_id)
+TenantApp -> Analyt : Emit order events\n(include loyalty flags)
+
+@enduml

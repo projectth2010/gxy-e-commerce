@@ -1,0 +1,49 @@
+@startuml SystemPlanesOverview
+
+title Multi-Tenant Platform - Planes & Main Services (Concept Level)
+
+skinparam componentStyle rectangle
+
+package "Control Plane" {
+  [Center-Tenant Management]
+  [Plan & Feature Management]
+  [Platform Monitoring & Ops]
+  [Billing & Subscription] #DDDDDD
+}
+
+package "Data Plane" {
+  [Tenant Application Services]
+  [Shared Domain Services]
+}
+
+package "Analytics Plane" {
+  [Ingestion & Logging]
+  [ETL / ELT Processing]
+  [Analytics & AI Services]
+}
+
+actor "Platform Admin\n(Center UI)" as Admin
+actor "Tenant User\n(Storefront / Backoffice)" as TenantUser
+
+Admin --> [Center-Tenant Management]
+Admin --> [Plan & Feature Management]
+Admin --> [Platform Monitoring & Ops]
+Admin --> [Billing & Subscription]
+
+TenantUser --> [Tenant Application Services]
+
+[Center-Tenant Management] --> [Tenant Application Services] : Tenant lifecycle\n& config commands
+[Plan & Feature Management] --> [Tenant Application Services] : Effective features\n(pull/push)
+[Platform Monitoring & Ops] --> [Tenant Application Services] : Ops controls\n(suspend, read-only)
+
+[Tenant Application Services] --> [Shared Domain Services] : Payments, notifications,\nmedia, etc.
+
+[Tenant Application Services] --> [Ingestion & Logging] : Business & operational events\n(tenant_id, metrics, logs)
+[Center-Tenant Management] --> [Ingestion & Logging] : Tenant lifecycle\n& config events
+[Shared Domain Services] --> [Ingestion & Logging] : Payment/notification events
+
+[ETL / ELT Processing] --> [Analytics & AI Services]
+[Analytics & AI Services] --> [Platform Monitoring & Ops] : KPIs, alerts, anomalies
+[Analytics & AI Services] --> [Center-Tenant Management] : Recommendations\n(plan/feature suggestions)
+
+@enduml

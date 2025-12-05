@@ -1,0 +1,42 @@
+@startuml TenantPOSOrderFlow
+
+title Tenant POS Order Flow (Concept)
+
+actor "Tenant Staff\n(POS User)" as Staff
+participant "POS UI" as POS
+participant "Tenant App\n(Order & Inventory)" as TenantApp
+participant "Payment Service" as Pay
+participant "Notification Service" as Noti
+participant "Analytics & Loyalty\n(Analytics/Loyalty Services)" as Analyt
+
+== Start POS Session ==
+Staff -> POS : Login / Open POS
+POS -> TenantApp : Authenticate staff\n[tenant_id, store_id]
+
+== Build Cart ==
+Staff -> POS : Scan/Select products\n+ apply discounts
+POS -> TenantApp : Get product details / prices\n[tenant_id, store_id]
+TenantApp --> POS : Product info
+
+Staff -> POS : Confirm cart\n(customer optional)
+POS -> TenantApp : Create draft POS order\n(cart, customer, channel=POS)
+
+== Payment ==
+Staff -> POS : Select payment method\n(cash/card/other)
+POS -> TenantApp : Request payment\n(orderId, amount, method)
+TenantApp -> Pay : Initiate payment\n(order context, POS channel)
+Pay --> TenantApp : Payment result\n(success/fail)
+TenantApp -> POS : Update order status\n(paid or failed)
+
+== Post-Processing ==
+alt payment success
+  TenantApp -> TenantApp : Update inventory\n(based on items)
+  TenantApp -> Noti : Send receipt notification\n(if email/phone available)
+  TenantApp -> Analyt : Emit order event\n(channel=POS, tenant_id, store_id)\n+ loyalty accrual event
+else payment failed
+  TenantApp -> POS : Show failure reason\n(allow retry or cancel)
+end
+
+Staff -> POS : Print/hand receipt to customer
+
+@enduml
