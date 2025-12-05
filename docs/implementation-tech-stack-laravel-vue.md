@@ -279,7 +279,141 @@ Initial features (T3):
 
 ---
 
-## 6. Suggested Implementation Order (High-Level)
+## 6. UI/UX Guidelines (Initial)
+
+This section defines initial UI/UX guidelines for the three main Vue applications. It is intentionally opinionated but lightweight so teams can start building screens without waiting for full design artifacts. It should evolve together with design system work.
+
+### 6.1 Center Admin – Platform Operators
+
+**Primary goals (C1–C3):**
+
+- Provide a fast, information-dense workspace for SA/Ops to manage tenants, plans, and platform governance.
+- Optimize for clarity and safety over marketing aesthetics.
+
+**Layout**
+
+- Left sidebar navigation with the following primary sections:
+  - Dashboard (high-level platform status – can be stubbed in early phases).
+  - Tenants (list/detail for tenant lifecycle operations).
+  - Plans & Features (C3+).
+  - System / Settings (future).
+- Top bar:
+  - Product name / logo.
+  - Environment badge (dev/stage/prod where applicable).
+  - User menu (profile, sign out).
+
+**Tenants list view (C1–C2)**
+
+- Table columns (minimum):
+  - Tenant code.
+  - Tenant name.
+  - Status (visual badge: draft, active, suspended, terminated).
+  - Plan (name or `—` if none).
+  - Created at / Last updated.
+  - Actions (View / Edit / Change status).
+- Filters:
+  - Status dropdown.
+  - Free-text search on code/name.
+- Row actions should be explicit and confirm destructive operations (e.g., suspend, terminate).
+
+**Tenant detail/edit view**
+
+- Group fields in logical sections:
+  - **Identity**: code (read-only), name, description.
+  - **Access & domains**: primary domain, additional domains (future), status.
+  - **Plan & features**: current plan, start/end date, feature summary (read-only in early phases).
+- Show a compact timeline or audit snippet (even if stubbed) to support operations and debugging.
+
+### 6.2 Tenant Backoffice – Tenant Admin & Staff
+
+**Primary goals (T2–T3):**
+
+- Provide a structured operational console for catalog, orders, and customers.
+- Favor consistency and predictability; avoid surprising navigation patterns.
+
+**Layout**
+
+- Left sidebar with main sections:
+  - Dashboard.
+  - Catalog (Products, Categories).
+  - Orders.
+  - Customers.
+  - Promotions (future).
+  - Reports / Analytics (where applicable).
+  - Settings.
+- Content area uses common patterns:
+  - List view → Detail view → Edit form.
+  - Primary actions in the top-right of the content area (e.g., "Add product").
+
+**Catalog UX (MVP)**
+
+- Product list:
+  - Table with SKU, name, status, base price, stock, store (if multi-store enabled).
+  - Filters for status, category, and text search.
+- Product detail/edit:
+  - Tabs or sections for Basics, Pricing, Inventory, Media.
+  - Validation feedback inline, with clear error messages.
+
+**Order management UX (MVP)**
+
+- Order list:
+  - Table with order number, date, customer, total, status, payment state.
+  - Quick filters for status (new, paid, shipped, completed, cancelled).
+- Order detail:
+  - Left side: core order info (items, totals, shipping, payment).
+  - Right side: status timeline and quick actions (change status, add tracking, add CS note).
+
+**Customer & CS workspace (MVP)**
+
+- Search bar that supports email, phone, and order number.
+- Consolidated view with:
+  - Customer profile (name, contact, tags).
+  - Order history.
+  - Internal notes timeline.
+- Notes are clearly marked as internal and never exposed to the customer.
+
+### 6.3 Tenant Storefront – End Customers
+
+**Primary goals (T3 MVP):**
+
+- Make it easy for customers to browse, understand products, and complete checkout.
+- Keep visual design simple but clean, leaving room for future theming.
+
+**Layout**
+
+- Header:
+  - Logo / store name.
+  - Primary navigation (top categories).
+  - Search box.
+  - Cart icon with item count.
+  - Account menu (Sign in / Profile) when supported.
+- Footer:
+  - Basic links (About, Contact, Policies), social links (optional).
+
+**Key flows**
+
+- Home:
+  - Highlight featured categories and selected products.
+- Category listing:
+  - Grid/list of products with image, name, price, and status badges (e.g., sale, out of stock).
+  - Filters and sort controls (price, popularity, newest first).
+- Product detail:
+  - Large image, gallery thumbnails.
+  - Title, price, key attributes, stock indicator.
+  - Clear "Add to cart" CTA, quantity selector.
+- Cart & checkout:
+  - Cart page with editable quantities and clear subtotal/total.
+  - Step-by-step checkout (address → shipping → payment review), aligned with Payment/Shipping configuration from Backoffice.
+
+**Responsiveness**
+
+- All three apps should be responsive, but for early phases:
+  - Center Admin and Tenant Backoffice prioritize desktop-first layouts.
+  - Storefront must support mobile and tablet as first-class experiences.
+
+---
+
+## 7. Suggested Implementation Order (High-Level)
 
 1. **Set up Laravel project and base infra**  
    - Install Laravel in `backend/laravel-app`.  
