@@ -26,3 +26,4 @@ Thumbs.db
 
 # A more general rule for node_modules in case new ones are added elsewhere
 **/node_modules
+PROGRESS.md
