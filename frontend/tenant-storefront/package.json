@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "pinia": "^2.1.7",
+    "uuid": "^13.0.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^20.12.5",
+    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/tsconfig": "^0.5.1",
     "typescript": "~5.4.0",
