@@ -177,6 +177,46 @@ class NotificationService
         }
     }
 
+    /**
+     * Send notification when subscription plan is changed
+     */
+    public function sendSubscriptionPlanChanged(
+        Tenant $tenant,
+        TenantPlanAssignment $oldSubscription,
+        TenantPlanAssignment $newSubscription,
+        float $proratedAmount = 0
+    ) {
+        $this->notifyTenant(
+            $tenant,
+            'subscription_plan_changed',
+            [
+                'old_plan' => $oldSubscription->plan->name,
+                'new_plan' => $newSubscription->plan->name,
+                'billing_cycle' => $newSubscription->billing_cycle,
+                'new_plan_price' => $newSubscription->plan->price,
+                'prorated_amount' => $proratedAmount,
+                'change_date' => now()->toDateString(),
+                'next_billing_date' => $newSubscription->ends_at->toDateString(),
+            ]
+        );
+    }
+
+    /**
+     * Send notification when subscription is reactivated
+     */
+    public function sendSubscriptionReactivated(Tenant $tenant, TenantPlanAssignment $subscription)
+    {
+        $this->notifyTenant(
+            $tenant,
+            'subscription_reactivated',
+            [
+                'plan_name' => $subscription->plan->name,
+                'ends_at' => $subscription->ends_at->toDateString(),
+                'billing_cycle' => $subscription->billing_cycle,
+            ]
+        );
+    }
+
     protected function notifyTenant(Tenant $tenant, string $event, array $data = [])
     {
         // Get users who should receive notifications

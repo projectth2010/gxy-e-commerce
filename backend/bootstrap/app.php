@@ -11,17 +11,26 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Apply tenant context to all web and API routes
+        // Create a new middleware group for webhooks that excludes tenant middleware
+        $middleware->group('webhook', [
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+        
+        // Replace the default tenant middleware with our custom one that can be disabled for specific routes
+        $middleware->alias([
+            'tenant' => \App\Http\Middleware\DisableTenantForRoutes::class,
+        ]);
+        
+        // Apply tenant context to web and API routes
         $middleware->web(\App\Http\Middleware\TenantContextMiddleware::class);
         $middleware->api(\App\Http\Middleware\TenantContextMiddleware::class);
-        
-        // Add other middleware as needed
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })
     ->withProviders([
-        // Register our service provider
+        // Register our service providers
         \App\Providers\TenancyServiceProvider::class,
+        \App\Providers\RouteServiceProvider::class,
     ])
     ->create();
