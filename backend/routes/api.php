@@ -13,4 +13,5 @@ Route::prefix('center')->group(function () {
 
 Route::middleware(['tenant'])->prefix('tenant')->group(function () {
     // Tenant-facing APIs (catalog, orders, etc.) will be defined here.
+    Route::post('/track', [\App\Http\Controllers\Api\EventTrackingController::class, 'store'])->name('tenant.track');
 });
