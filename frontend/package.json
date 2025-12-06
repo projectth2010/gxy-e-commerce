@@ -1,0 +1,24 @@
+{
+  "name": "gxy-ecommerce-frontend",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@inertiajs/vue3": "^1.0.12",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "axios": "^1.6.2",
+    "chart.js": "^4.4.1",
+    "vue": "^3.3.8",
+    "vue-chartjs": "^5.2.0",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.0.0"
+  }
+}

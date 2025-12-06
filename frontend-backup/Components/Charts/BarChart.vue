@@ -1,0 +1,92 @@
+<template>
+  <div class="chart-container">
+    <canvas ref="chart"></canvas>
+  </div>
+</template>
+
+<script>
+import { defineComponent, onMounted, ref, watch } from 'vue';
+import { Bar } from 'vue-chartjs';
+import { 
+  Chart as ChartJS, 
+  Title, 
+  Tooltip, 
+  Legend, 
+  BarElement, 
+  LinearScale, 
+  CategoryScale 
+} from 'chart.js';
+
+ChartJS.register(
+  Title, 
+  Tooltip, 
+  Legend, 
+  BarElement, 
+  LinearScale, 
+  CategoryScale
+);
+
+export default defineComponent({
+  name: 'BarChart',
+  components: { Bar },
+  props: {
+    chartData: {
+      type: Object,
+      required: true,
+    },
+    options: {
+      type: Object,
+      default: () => ({}),
+    },
+    height: {
+      type: Number,
+      default: 300,
+    },
+  },
+  setup(props) {
+    const chart = ref(null);
+    let chartInstance = null;
+
+    const renderChart = () => {
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      const ctx = chart.value.getContext('2d');
+      chartInstance = new ChartJS(ctx, {
+        type: 'bar',
+        data: props.chartData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          ...props.options,
+        },
+      });
+    };
+
+    onMounted(() => {
+      renderChart();
+    });
+
+    watch(
+      () => props.chartData,
+      () => {
+        renderChart();
+      },
+      { deep: true }
+    );
+
+    return {
+      chart,
+    };
+  },
+});
+</script>
+
+<style scoped>
+.chart-container {
+  position: relative;
+  height: 100%;
+  min-height: 300px;
+}
+</style>
