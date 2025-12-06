@@ -9,6 +9,7 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         \App\Console\Commands\SendSubscriptionReminders::class,
+        \App\Console\Commands\MonitorSubscriptionHealth::class,
     ];
 
     protected function schedule(Schedule $schedule)
@@ -16,6 +17,10 @@ class Kernel extends ConsoleKernel
         // Send subscription reminders daily at 9 AM
         $schedule->command('subscriptions:send-reminders')
                  ->dailyAt('09:00');
+                 
+        // Monitor subscription health daily at 3 AM
+        $schedule->command('subscriptions:monitor')
+                 ->dailyAt('03:00');
     }
 
     protected function commands()

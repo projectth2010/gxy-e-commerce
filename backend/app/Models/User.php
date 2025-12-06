@@ -53,4 +53,48 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Tenant::class);
     }
+
+    /**
+     * Get all of the subscriptions for the user.
+     */
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * Get the user's current subscription, if any.
+     */
+    public function currentSubscription()
+    {
+        return $this->subscriptions()
+            ->where(function ($query) {
+                $query->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('trial_ends_at')
+                    ->orWhere('trial_ends_at', '>', now());
+            })
+            ->orderBy('created_at', 'desc')
+            ->first();
+    }
+
+    /**
+     * Determine if the user has an active subscription.
+     */
+    public function subscribed(): bool
+    {
+        $subscription = $this->currentSubscription();
+        return $subscription && $subscription->isActive();
+    }
+
+    /**
+     * Determine if the user is on trial.
+     */
+    public function onTrial(): bool
+    {
+        $subscription = $this->currentSubscription();
+        return $subscription && $subscription->onTrial();
+    }
 }

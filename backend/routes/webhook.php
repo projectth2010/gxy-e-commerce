@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/stripe-webhook', function (Request $request) {
+Route::middleware(['stripe.webhook'])->group(function () {
+    Route::post('/stripe-webhook', function (Request $request) {
     $payload = $request->getContent();
     
     // For testing, allow skipping signature verification
@@ -21,10 +23,16 @@ Route::post('/stripe-webhook', function (Request $request) {
         $signature = $request->header('Stripe-Signature');
         
         try {
+            $webhookSecret = config('stripe.webhook_secret');
+            if (empty($webhookSecret)) {
+                Log::error('Stripe webhook secret is not configured');
+                return response()->json(['error' => 'Webhook not configured'], 500);
+            }
+            
             $event = \Stripe\Webhook::constructEvent(
                 $payload, 
                 $signature, 
-                config('services.stripe.webhook_secret')
+                $webhookSecret
             );
         } catch (\UnexpectedValueException $e) {
             // Invalid payload
@@ -54,5 +62,6 @@ Route::post('/stripe-webhook', function (Request $request) {
         }
     }
     
-    return response()->json(['status' => 'success']);
-})->name('stripe.webhook');
+        return response()->json(['status' => 'success']);
+    })->name('stripe.webhook');
+});

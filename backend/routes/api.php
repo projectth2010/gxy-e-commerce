@@ -8,55 +8,16 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 Route::post('/login', [\App\Http\Controllers\Api\Auth\AuthController::class, 'login']);
 
 // Webhook routes (excluded from tenant middleware)
-Route::prefix('webhook')->group(function () {
-    // Stripe webhook (must be public and not use tenant middleware)
-    Route::post('/stripe', function (Request $request) {
-        // Skip tenant middleware for this route
-        app('router')->getRoutes()->match($request)->forgetMiddleware(['tenant', 'tenant-context']);
-        
-        $payload = $request->getContent();
-        
-        // For testing, allow skipping signature verification
-        if (!app()->environment('testing')) {
-            $signature = $request->header('Stripe-Signature');
-            
-            try {
-                $event = \Stripe\Webhook::constructEvent(
-                    $payload, 
-                    $signature, 
-                    config('services.stripe.webhook_secret')
-                );
-            } catch (\UnexpectedValueException $e) {
-                // Invalid payload
-                return response()->json(['error' => 'Invalid payload'], 400);
-            } catch (\Stripe\Exception\SignatureVerificationException $e) {
-                // Invalid signature
-                return response()->json(['error' => 'Invalid signature'], 400);
-            }
-        } else {
-            $event = json_decode($payload, true);
-        }
-        
-        // Handle the event
-        if (is_array($event) && isset($event['type'])) {
-            $event = (object) $event;
-        }
-        
-        if (isset($event->type)) {
-            switch ($event->type) {
-                case 'customer.subscription.updated':
-                    // For testing, just return success
-                    return response()->json(['status' => 'success']);
-                case 'invoice.payment_succeeded':
-                    // Handle successful payment
-                    break;
-                // Add more event types as needed
-            }
-        }
-        
-        return response()->json(['status' => 'success']);
-    })->name('stripe.webhook');
-})->withoutMiddleware(['tenant', 'tenant-context']);
+Route::post('/webhook/stripe', 'App\Http\Controllers\Api\StripeWebhookController')
+    ->name('stripe.webhook')
+    ->withoutMiddleware(['tenant', 'tenant-context', 'auth:api']);
+
+// API Routes
+Route::middleware(['auth:api', 'tenant-context'])->group(function () {
+    // Include all API route files
+    require __DIR__.'/api/analytics.php';
+    // Add other route files here
+});
 
 // Public health check endpoint
 Route::get('/health', function () {

@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'tenant' => \App\Http\Middleware\TenantMiddleware::class,
         'tenant-context' => \App\Http\Middleware\TenantContextMiddleware::class,
         'verify.stripe.webhook' => \App\Http\Middleware\VerifyStripeWebhook::class,
+        'stripe.webhook' => \App\Http\Middleware\StripeWebhookMiddleware::class,
     ];
 }
