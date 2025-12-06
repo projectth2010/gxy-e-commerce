@@ -11,8 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Apply tenant context to all web and API routes
+        $middleware->web(\App\Http\Middleware\TenantContextMiddleware::class);
+        $middleware->api(\App\Http\Middleware\TenantContextMiddleware::class);
+        
+        // Add other middleware as needed
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->withProviders([
+        // Register our service provider
+        \App\Providers\TenancyServiceProvider::class,
+    ])
+    ->create();
