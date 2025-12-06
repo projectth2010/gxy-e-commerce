@@ -27,17 +27,17 @@ class SubscriptionNotification extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
+        // Use custom template for payment failed notifications
+        if ($this->event === 'payment_failed') {
+            return $this->buildPaymentFailedMail($notifiable);
+        }
+
         $subject = $this->getSubject();
         $greeting = $this->getGreeting();
         $message = $this->getMessage();
         
         $actionUrl = url('/dashboard/subscription');
         $actionText = 'View Subscription';
-        
-        if ($this->event === 'payment_failed' && !empty($this->data['update_payment_method_url'])) {
-            $actionUrl = $this->data['update_payment_method_url'];
-            $actionText = 'Update Payment Method';
-        }
 
         return (new MailMessage)
             ->subject($subject)
@@ -51,6 +51,28 @@ class SubscriptionNotification extends Notification implements ShouldQueue
                     'Thank you for using our application!',
                 ]
             ]);
+    }
+
+    /**
+     * Build the payment failed mail message.
+     *
+     * @param  mixed  $notifiable
+     * @return \Illuminate\Notifications\Messages\MailMessage
+     */
+    protected function buildPaymentFailedMail($notifiable)
+    {
+        $data = array_merge([
+            'user' => $notifiable,
+            'amount' => $this->data['amount'] ?? null,
+            'plan_name' => $this->data['plan_name'] ?? null,
+            'reason' => $this->data['reason'] ?? 'Payment processing failed',
+            'next_retry_date' => $this->data['next_retry_date'] ?? null,
+            'update_payment_url' => $this->data['update_payment_url'] ?? null,
+        ], $this->data);
+
+        return (new MailMessage)
+            ->subject('Payment Failed - ' . config('app.name'))
+            ->view('emails.payment-failed', $data);
     }
 
     public function toArray($notifiable)

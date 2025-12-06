@@ -49,6 +49,77 @@ class NotificationService
         );
     }
 
+    public function sendSubscriptionExpired(Tenant $tenant, TenantPlanAssignment $subscription)
+    {
+        $this->notifyTenant(
+            $tenant,
+            'subscription_expired',
+            [
+                'plan_name' => $subscription->plan->name,
+                'renew_url' => route('subscription.renew', ['plan' => $subscription->plan_id]),
+            ]
+        );
+    }
+
+    /**
+     * Send payment failed notification
+     *
+     * @param Tenant $tenant
+     * @param TenantPlanAssignment|float $subscriptionOrAmount Either a subscription or the payment amount
+     * @param string|null $reason Reason for the failure
+     * @param string|null $nextRetryDate When the next payment attempt will be made
+     * @param string|null $nextAction Next action for the user
+     * @return void
+     */
+    public function sendPaymentFailed(
+        Tenant $tenant, 
+        $subscriptionOrAmount, 
+        ?string $reason = null,
+        ?string $nextRetryDate = null,
+        ?string $nextAction = null
+    ) {
+        $isSubscription = $subscriptionOrAmount instanceof TenantPlanAssignment;
+        
+        $data = [
+            'failed_at' => now()->toDateTimeString(),
+            'next_action' => $nextAction,
+        ];
+
+        if ($isSubscription) {
+            $subscription = $subscriptionOrAmount;
+            $data = array_merge($data, [
+                'plan_name' => $subscription->plan->name,
+                'amount' => $subscription->plan->price,
+                'reason' => $reason,
+                'next_retry_date' => $nextRetryDate,
+                'update_payment_url' => route('billing.payment-method'),
+            ]);
+        } else {
+            $data['amount'] = $subscriptionOrAmount;
+            if ($reason) {
+                $data['reason'] = $reason;
+            }
+        }
+
+        $this->notifyTenant($tenant, 'payment_failed', $data);
+    }
+
+    /**
+     * Send payment succeeded notification
+     *
+     * @param Tenant $tenant
+     * @param float $amount
+     * @param string|null $invoiceUrl
+     * @return void
+     */
+    /**
+     * Send payment succeeded notification
+     *
+     * @param Tenant $tenant
+     * @param float $amount
+     * @param string|null $invoiceUrl
+     * @return void
+     */
     public function sendPaymentSucceeded(Tenant $tenant, $amount, $invoiceUrl = null)
     {
         $this->notifyTenant(
@@ -58,19 +129,6 @@ class NotificationService
                 'amount' => $amount,
                 'invoice_url' => $invoiceUrl,
                 'paid_at' => now()->toDateTimeString(),
-            ]
-        );
-    }
-
-    public function sendPaymentFailed(Tenant $tenant, $amount, $nextAction = null)
-    {
-        $this->notifyTenant(
-            $tenant,
-            'payment_failed',
-            [
-                'amount' => $amount,
-                'failed_at' => now()->toDateTimeString(),
-                'next_action' => $nextAction,
             ]
         );
     }

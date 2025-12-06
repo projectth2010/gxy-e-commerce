@@ -59,11 +59,28 @@ class TestNotification extends Command
                 break;
                 
             case 'payment_failed':
-                $data = [
-                    'amount' => 29.99,
-                    'update_payment_method_url' => 'https://example.com/update-payment-method',
-                ];
-                break;
+                $subscription = $subscription ?? $tenant->activeSubscription;
+                if ($subscription) {
+                    app(\App\Services\NotificationService::class)->sendPaymentFailed(
+                        $tenant,
+                        $subscription,
+                        'Insufficient funds',
+                        now()->addDays(3)->toDateString(),
+                        'Please update your payment method to avoid service interruption.'
+                    );
+                    $this->info('Payment failed notification sent for subscription.');
+                    return 0;
+                } else {
+                    app(\App\Services\NotificationService::class)->sendPaymentFailed(
+                        $tenant,
+                        29.99,
+                        'Insufficient funds',
+                        now()->addDays(3)->toDateString(),
+                        'Please update your payment method to avoid service interruption.'
+                    );
+                    $this->info('Payment failed notification sent with amount.');
+                    return 0;
+                }
         }
 
         $user = $tenant->users()->first();
