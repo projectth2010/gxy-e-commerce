@@ -42,11 +42,23 @@ Depending on implementation size and complexity, these components may be deploye
 
 ### 2.2 Frontend Architecture
 
-- **Center Control UI** (Web admin portal for platform operators).
-- **Tenant Backoffice UI** (Admin portal for store owners and staff).
-- **Tenant Storefront UI** (Public shop interface).
+The frontend is not a single monolithic application. Instead, it is composed of three distinct, standalone Single-Page Applications (SPAs):
 
-All UIs interact with the backend via well-defined APIs and share a consistent identity and authorization model.
+- **Center Control UI**: A dedicated web application for platform operators to manage tenants, plans, and global settings.
+- **Tenant Backoffice UI**: A dedicated web application for store owners and staff to manage their specific store (products, orders, etc.).
+- **Tenant Storefront UI**: The public-facing e-commerce shop for each tenant's customers.
+
+This multi-project structure is a deliberate choice to support an enterprise model and provides several key advantages:
+
+1.  **Independent Development and Deployment**: Each frontend application is a separate project with its own codebase and dependencies. This allows different teams to work on them in parallel and, most importantly, enables them to be deployed independently. A change in the Tenant Storefront does not require a redeployment of the Center Control, increasing agility and reducing risk.
+
+2.  **Clear Boundaries and Ownership**: This separation creates clear lines of code ownership and aligns the frontend architecture with the backend's "Control Plane" (Center Control) and "Data Plane" (Tenant Applications) concept.
+
+3.  **Scalability and Maintainability**: As the platform grows, managing three smaller, focused applications is significantly more scalable and maintainable than managing one large, monolithic frontend codebase.
+
+4.  **Technological Flexibility**: While initially developed with a consistent stack (Vue.js), this architecture allows for future flexibility. Different applications could potentially be rewritten or developed using different frontend technologies if business needs evolve, as long as they adhere to the same backend API contract.
+
+All UIs are self-contained and only interact with the backend via the centralized, well-defined API layer, sharing a consistent identity and authorization model.
 
 ## 3. Multi-Tenant Strategy
 

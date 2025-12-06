@@ -1,0 +1,28 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.idea/
+.vscode/
+
+# Gemini CLI temp directory
+/.gemini/
+
+# Log files
+*.log
+
+# Environment variables
+# Don't commit .env files. Copy .env.example instead.
+.env
+.env.*
+!.env.example
+
+# Frontend
+# Ignore node_modules, dist, and other generated files in all frontend projects
+/frontend/*/node_modules
+/frontend/*/dist
+/frontend/*/.vite
+
+# A more general rule for node_modules in case new ones are added elsewhere
+**/node_modules

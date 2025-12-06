@@ -34,7 +34,13 @@ There are two main multi-tenant database patterns under consideration:
   - Higher operational overhead (many DBs).
   - Cross-tenant reporting becomes more complex.
 
-> **Final Choice**: [To be confirmed – choose one and provide justification here.]
+> **Final Choice**: **Shared Database, Shared Schema (with `tenant_id`)**.
+>
+> **Justification**: This model has been selected and implemented in the core backend application for the following reasons:
+> 1.  **Operational Simplicity**: It significantly simplifies database management, monitoring, and backup/restore procedures as there is only one primary database to manage.
+> 2.  **Framework Alignment**: The chosen backend framework (Laravel) provides robust application-layer tenancy patterns (e.g., global scopes and traits like the implemented `BelongsToTenant`). This allows for enforcing data isolation reliably within the application code, mitigating the risk of data leakage.
+> 3.  **Simplified Analytics**: It enables more straightforward cross-tenant reporting and analytics, which is a core requirement for the Center Control to have a platform-wide overview.
+> 4.  **Performance**: While table sizes can grow, this can be managed with standard database scaling techniques such as indexing strategies and table partitioning. The benefits of a single database outweigh the complexity of managing thousands of individual databases for the initial phases of the platform.
 
 ## 3. Logical Data Model
 
@@ -153,6 +159,6 @@ High-level entities (simplified list):
 
 ## 11. Open Points / To Be Defined
 
-- Final selection between shared DB vs DB-per-tenant.
+
 - Exact indexing strategy based on real query patterns.
 - Regulatory or compliance requirements (if any) that may affect data retention or encryption.

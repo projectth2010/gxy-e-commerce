@@ -1,0 +1,41 @@
+@startuml Deployment Overview
+
+title Example Deployment Architecture
+
+actor "User / Admin" as user
+
+cloud "Internet" {
+    node "DNS / CDN / Load Balancer" as lb
+}
+
+package "Static Web Hosting (e.g., S3, Vercel, Netlify)" {
+    artifact "Center Control UI\n(Vue.js SPA)" as fe_center
+    artifact "Tenant Backoffice UI\n(Vue.js SPA)" as fe_backoffice
+    artifact "Tenant Storefront UI\n(Vue.js SPA)" as fe_storefront
+}
+
+package "Application Hosting (e.g., EC2, Docker, K8s)" {
+    node "API Server" as app_server {
+        component "Backend API\n(Laravel)" as backend
+    }
+}
+
+database "Database Service (e.g., RDS)" {
+    component "Shared Database\n(MySQL/Postgres)" as db
+}
+
+user -right-> lb
+
+lb --> fe_center : "admin.gxy.com"
+lb --> fe_backoffice : "shop.gxy.com"
+lb --> fe_storefront : "my-store.com"
+
+lb -down-> app_server : "api.gxy.com"
+
+fe_center -down- app_server : "API Calls"
+fe_backoffice -down- app_server : "API Calls"
+fe_storefront -down- app_server : "API Calls"
+
+backend -right-> db
+
+@enduml
