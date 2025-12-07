@@ -9,16 +9,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@inertiajs/vue3": "^1.0.12",
-    "@vitejs/plugin-vue": "^5.0.0",
-    "axios": "^1.6.2",
+    "@headlessui/react": "^2.2.9",
+    "@heroicons/react": "^2.2.0",
+    "axios": "^1.13.2",
     "chart.js": "^4.4.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "vue": "^3.3.8",
     "vue-chartjs": "^5.2.0",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
+    "@inertiajs/react": "^2.2.19",
+    "@inertiajs/vue3": "^2.2.19",
+    "@vitejs/plugin-react": "^5.1.1",
     "@vitejs/plugin-vue": "^5.0.0",
+    "laravel-vite-plugin": "^1.3.0",
     "vite": "^5.0.0"
   }
 }
