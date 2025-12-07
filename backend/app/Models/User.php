@@ -47,6 +47,14 @@ class User extends Authenticatable
     ];
 
     /**
+     * Get the payment methods for the user.
+     */
+    public function paymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::class);
+    }
+
+    /**
      * The tenants that belong to the user.
      */
     public function tenants()
